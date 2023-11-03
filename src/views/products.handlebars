@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+</head>
+
+<body>
+    <header>
+        <h1 class="tituloItem">Mundo Gamer</h1>
+    </header>
+
+
+    <form method="get" action="/api/products" id="filter-form" class="filtros">
+        <label for="category">Seleccionar categoría:</label>
+        <select name="query" id="category">
+            <option value="">Todas las categorías</option>
+            <option value="PS4">PS4</option>
+            <option value="PS5">PS5</option>
+        </select>
+
+        <label for="availability"> Filtrar por Disponibilidad:</label>
+        <select name="availability" id="availability">
+            <option value="">Todos</option>
+            <option value="available">Disponibles</option>
+            <option value="outOfStock">Sin Stock</option>
+        </select>
+
+        <label for="sort"> Ordenar por precio:</label>
+        <select name="sort" id="sort">
+            <option value="">Sin ordenar</option>
+            <option value="asc">Menor a mayor</option>
+            <option value="desc">Mayor a menor</option>
+        </select>
+
+        <button type="submit" class="filterButton">Filtrar</button>
+    </form>
+    <div class="container">
+        {{#if productList.length}}
+        {{#each productList}}
+        <div class="cards">
+            <img src="{{this.thumbnails}}" alt="Imagen del producto" class="productImage">
+            <h3 class="cardTitle">{{this.title}}</h3>
+            <h4 class="cardPrice">$ {{this.price}}</h4>
+            <h4 class="cardStock">Stock: {{this.stock}}</h4>
+            <a href="/api/product/{{_id}}" class="btn btn-primary">Ver Detalle</a>
+        </div>
+        {{/each}}
+        {{else}}
+        <h1>No se encontraron productos</h1>
+        {{/if}}
+    </div>
+
+
+
+    <div class="pagination">
+        {{#if pagination.prevLink}}
+        <a href="{{pagination.prevLink}}" class="paginationArrow">anterior</a>
+        {{/if}}
+        {{#if pagination.nextLink}}
+        <a href="{{pagination.nextLink}}" class="paginationArrow">siguiente</a>
+        {{/if}}
+    </div>
+
+    <script src="/js/filter.js"></script>
+</body>
+
+</html>

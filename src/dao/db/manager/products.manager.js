@@ -7,7 +7,7 @@ class ProductManager {
     async findAll(obj) {
         try {
 
-            const { limit = 3, page = 1, sort = '', query = '', availability = '' } = (obj);
+            const { limit = 4, page = 1, sort = '', query = '', availability = '' } = (obj);
 
             const filter = {};
 

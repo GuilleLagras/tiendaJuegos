@@ -4,10 +4,15 @@ import exphbs from 'express-handlebars';
 import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access';
 import Handlebars from 'handlebars';
 import { Server } from "socket.io";
+import MongoStore from "connect-mongo";
 import productsRouter from "./Routes/products.routes.js";
 import cartsRouter from "./Routes/cart.routes.js";
 import viewsRouter from "./Routes/views.routes.js";
 import messageRouter from "./Routes/message.routes.js";
+import sessionsrouter from './Routes/sessions.routes.js';
+import session from "express-session";
+import mongoose from "mongoose";
+
 
 // coneccion a db
 import "./dao/db/configDB.js"
@@ -22,6 +27,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(__dirname + '/public'))
 
+//Session
+app.use(session({
+    store: MongoStore.create({
+        client: mongoose.connection.getClient(),
+        ttl: 3600
+    }),
+    secret: 'Coder5575Secret',
+    resave: true, // sirve para poder refrescar o actualizar la sesión luego de un de inactivadad
+    saveUninitialized: true, // sirve para desactivar el almacenamiento de la session si el usuario aún no se ha identificado o aún no a iniciado sesión
+}));
+
 //handlebars
 const hbs = exphbs.create({
     extname: 'handlebars',
@@ -33,12 +49,19 @@ app.engine('handlebars', hbs.engine);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
 
-//routes de products , carts , mensaje
-
+//routes de products , carts , mensaje,session
+app.use((req, res, next) => {
+    res.locals.user = req.session.user || null;
+    next();
+});
 app.use('/api/carts', cartsRouter);
 app.use('/', viewsRouter);
 app.use('/chat', messageRouter);
 app.use('/products', productsRouter);
+app.use('/api/sessions', sessionsrouter);
+
+
+
 // Iniciar el servidor
 const httpServer = app.listen(PORT, () => {
     console.log(`Escuchando en el puerto ${PORT}`);
@@ -59,7 +82,7 @@ socketServer.on('connection', async (socket) => {
     socket.on('addProduct', async (product) => {
         try {
             const createdProduct = await productManager.createOne(product);
-            const productosActualizados = await productManager.findAll();
+            const productosActualizados = await productManager.findAll({limit:100});
             socketServer.emit('actualizarProductos', productosActualizados);
             console.log(createdProduct)
         } catch (error) {
@@ -73,7 +96,7 @@ socketServer.on('connection', async (socket) => {
             const result = await productManager.deleteOne({ _id: id });
 
             if (result.deletedCount > 0) {
-                const productosActualizados = await productManager.findAll();
+                const productosActualizados = await productManager.findAll({limit:100});
                 socketServer.emit('actualizarProductos', productosActualizados);
             } else {
                 console.error('El producto no se encontró para eliminar.');

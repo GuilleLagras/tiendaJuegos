@@ -1,4 +1,3 @@
-!
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,10 +22,16 @@
                 <div class="navbar-nav">
                     <a class="nav-link active" aria-current="page" href="/">Inicio</a>
                     <a class="nav-link" href="/realtimeproducts">Tiempo real</a>
-                    <a class="nav-link" href='/chat'>Chat</a ->
+                    <a class="nav-link" href='/chat'>Chat</a>
                     <a class="nav-link" href="/api/carts">Carrito</a>
+                    {{#if user}}
+                    <a class="nav-link" href="/profile">Ver Perfil</a>
+                    {{else}}
+                    <a class="nav-link" href="/login">Iniciar sesión</a>
+                    {{/if}}
                 </div>
             </div>
+            
         </div>
     </nav>
     {{{body}}}

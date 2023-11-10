@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
             code: codeInput.value,
             stock: parseInt(stockInput.value),
             thumbnails: thumbnailsInput.value,
-
         };
 
         // Agregar producto
